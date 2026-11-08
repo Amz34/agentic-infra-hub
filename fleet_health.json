@@ -1,0 +1,13 @@
+{
+  "status": "WARNINGS_DETECTED",
+  "timestamp": "2026-11-08T11:09:42.422146+00:00",
+  "total_logs_scanned": 123,
+  "anomalies_detected": 1,
+  "details": [
+    {
+      "log": "deep_research_cron.log",
+      "snippet": "Traceback (most recent call last):",
+      "recent_line_offset": 22
+    }
+  ]
+}
