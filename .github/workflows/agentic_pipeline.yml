@@ -1,0 +1,42 @@
+name: "Agentic Infra CI & Autonomous Dispatch"
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+    inputs:
+      task_description:
+        description: "Task description for autonomous FDE execution"
+        required: true
+        default: "Automated health check and infra verification"
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
+jobs:
+  agentic-pipeline:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Stage 1 & 2 & 3: Autonomous Plan -> Analyze -> Execute
+        run: |
+          chmod +x agentic_engine.py
+          TASK="${{ github.event.inputs.task_description || 'CI Triggered Autonomous Pipeline Run' }}"
+          python3 agentic_engine.py --task "$TASK"
+
+      - name: Verify Audit Manifest
+        run: |
+          test -f last_run_manifest.json
+          test -f audit_trail.jsonl
+          echo "Audit trail intact. Manifest verified."
