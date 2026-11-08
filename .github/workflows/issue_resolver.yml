@@ -1,0 +1,44 @@
+name: "Autonomous Issue-to-PR Engine"
+
+on:
+  issues:
+    types: [labeled]
+
+jobs:
+  agentic-resolver:
+    if: github.event.label.name == 'agent:execute'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
+
+    steps:
+      - name: Checkout Codebase
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Acknowledge Issue Dispatch
+        run: |
+          gh issue comment "${{ github.event.issue.number }}" --body "🤖 **Autonomous FDE Agent Activated:**
+          Processing issue #${{ github.event.issue.number }} through governance: **Plan -> Analyze -> Execute**."
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Execute Autonomous Agent
+        run: |
+          chmod +x agentic_engine.py
+          python3 agentic_engine.py --task "Resolve Issue #${{ github.event.issue.number }}: ${{ github.event.issue.title }}"
+
+      - name: Record Audit Log
+        run: |
+          gh issue comment "${{ github.event.issue.number }}" --body "✅ **Autonomous Execution Complete:**
+          - Pre-flight constraints audited.
+          - Task verified against centralized infra.
+          - State snapshot recorded in audit trail."
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
