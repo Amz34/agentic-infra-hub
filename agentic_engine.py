@@ -70,20 +70,32 @@ class AgenticInfraEngine:
         
         # Check CLI & Tools
         tools_status = {}
-        for tool in ["git", "gh", "python3", "docker"]:
+        for tool in ["git", "python3"]:
             res = execute_shell(f"which {tool}", check=False)
             tools_status[tool] = (res.returncode == 0)
 
-        # Check GitHub Auth status
-        gh_auth_res = execute_shell("gh auth status", check=False)
-        gh_authed = (gh_auth_res.returncode == 0)
+        # Optional tool verification
+        for tool in ["gh", "docker"]:
+            res = execute_shell(f"which {tool}", check=False)
+            tools_status[tool] = (res.returncode == 0)
+
+        # Check GitHub Auth status if running locally or if GH_TOKEN is present
+        gh_authed = False
+        if os.environ.get("GITHUB_TOKEN") or os.environ.get("GH_TOKEN"):
+            gh_authed = True
+        else:
+            gh_auth_res = execute_shell("gh auth status", check=False)
+            gh_authed = (gh_auth_res.returncode == 0)
+
+        # Core requirements: git and python3 must always be present
+        core_ready = tools_status.get("git", False) and tools_status.get("python3", False)
 
         self.analysis_artifacts = {
             "tools_available": tools_status,
             "gh_authenticated": gh_authed,
-            "disk_free_mb": 1024, # baseline
+            "core_ready": core_ready,
             "risk_score": "LOW",
-            "constraints_passed": all(tools_status.values()) and gh_authed
+            "constraints_passed": core_ready
         }
 
         if not self.analysis_artifacts["constraints_passed"]:
