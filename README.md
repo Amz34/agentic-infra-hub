@@ -44,3 +44,7 @@ gh workflow run agentic_pipeline.yml -f task_description="Deploy model evaluatio
 ## Audit Logs & Manifests
 - [`audit_trail.jsonl`](./audit_trail.jsonl): Append-only structured logs capturing timestamps, phases, and statuses.
 - [`last_run_manifest.json`](./last_run_manifest.json): State of the most recent production run.
+
+---
+
+Part of [my always-on agent stack](https://github.com/Amz34) · [Awesome Agent Infrastructure](https://github.com/Amz34/awesome-agent-infrastructure) (135 live-checked building blocks).
