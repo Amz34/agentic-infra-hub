@@ -1,4 +1,4 @@
-name: "Agentic Infra CI & Autonomous Dispatch"
+name: Agentic Infra CI
 
 on:
   push:
@@ -8,14 +8,9 @@ on:
   workflow_dispatch:
     inputs:
       task_description:
-        description: "Task description for autonomous FDE execution"
+        description: "Task description"
         required: true
-        default: "Automated health check and infra verification"
-
-permissions:
-  contents: write
-  pull-requests: write
-  issues: write
+        default: "Automated verification"
 
 jobs:
   agentic-pipeline:
@@ -29,10 +24,12 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Stage 1 & 2 & 3: Autonomous Plan -> Analyze -> Execute
+      - name: Stage 1 2 3 Autonomous Plan Analyze Execute
+        env:
+          INPUT_TASK: ${{ github.event.inputs.task_description }}
         run: |
           chmod +x agentic_engine.py
-          TASK="${{ github.event.inputs.task_description || 'CI Triggered Autonomous Pipeline Run' }}"
+          TASK="${INPUT_TASK:-CI Triggered Autonomous Pipeline Run}"
           python3 agentic_engine.py --task "$TASK"
 
       - name: Verify Audit Manifest
